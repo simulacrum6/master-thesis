@@ -1,0 +1,60 @@
+# see https://espnet.github.io/espnet/apis/espnet_bin.html#asr-train-py
+# see https://espnet.github.io/espnet/_modules/espnet/nets/pytorch_backend/e2e_asr.html#E2E
+
+###
+# NETWORK
+###
+
+# encoder related
+etype: "blstmp"
+#subsample: 1_2_2_2
+elayers: 3
+eunits: 1024
+eprojs: 512
+
+# decoder related
+dtype: "lstm"
+dlayers: 2
+dunits: 1024
+#sampling-probability: 0.0 # ratio of predicted labels fed back to decoder
+
+###
+# ATTENTION
+###
+atype: "multi_head_dot" # "dot" / "loc" / "multi_head_dot" / "multi_head_loc"
+aheads: 4
+adim: 128
+#aconv-chans: -1 # number of attention convolution channels
+#aconv-filts: -1 # number of attention convolution filters (default 100)
+
+
+###
+# LOSS FUNCTION
+##
+mtlalpha: 0.3 # Loss = alpha*ctc_loss + (1-alpha)*att_loss
+ctc-weight: 0.3
+#minlenratio: 0.0
+#maxlenratio: 0.0
+
+# minibatch related
+batch-size: 64
+maxlen-in: 512  # if input length  > maxlen-in, batchsize is automatically reduced
+maxlen-out: 150 # if output length > maxlen-out, batchsize is automatically reduced
+
+# optimization related
+#lsm-weight: 0.1 # label smoothing
+sortagrad: 0 # Feed samples from shortest to longest ; -1: enabled for all epochs, 0: disabled, other: enabled for 'other' epochs
+opt: adam
+accum-grad: 2
+grad-clip: 5
+#early-stop-criterion: "validation/main/acc"
+patience: 0
+epochs: 25
+dropout-rate: 0.0
+backend: pytorch
+model-module: "espnet.nets.pytorch_backend.e2e_asr:E2E"
+
+# reporting
+#report-wer: false
+#report-cer: false
+report-interval-iters: 100
